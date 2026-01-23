@@ -13,7 +13,17 @@ body {
   max-width: 1600px;
   margin: 0 auto;
   padding: 0;
-  
+  overflow-x: auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+.container {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.container > div {
+  min-width: 1000px;
 }
 
 /* Header Section */

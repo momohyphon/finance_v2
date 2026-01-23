@@ -61,7 +61,7 @@ finance_payload["bonds"] = {
 
 # --- [2] 주요 지표 데이터 수집 및 출력 ---
 tickers = {
-    "달러 인덱스": ("DX=F", "https://finance.yahoo.com/quote/DX=F/"),
+    "달러 인덱스": ("DX=F", "https://finance.yahoo.com/quote/DX-Y.NYB/"),
     "나스닥 지수": ("^IXIC", "https://finance.yahoo.com/quote/^IXIC/"),
     "S&P500 지수": ("^GSPC", "https://finance.yahoo.com/quote/^GSPC/"),
     "나스닥 선물": ("NQ=F", "https://finance.yahoo.com/quote/NQ=F/"),
