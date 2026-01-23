@@ -1,0 +1,287 @@
+/* Bloomberg Style CSS */
+body {
+  margin: 0;
+  padding: 0;
+  background: #000000;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #ffffff;
+  
+
+}
+
+.dashboard {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0;
+  
+}
+
+/* Header Section */
+.main-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px 30px;
+  border-bottom: 1px solid #1a1a1a;
+  background: #000000;
+}
+
+.main-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 40px 0;
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+}
+
+/* Main Tab Group */
+.main-tab-group {
+  display: flex;
+  gap: 0;
+  background: transparent;
+  border-bottom: 1px solid #2a2a2a;
+  padding: 0;
+  width: 100%;
+  justify-content: center;
+  margin-top: 30px; 
+}
+
+.main-btn {
+  padding: 16px 40px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: #666666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 3px solid transparent;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.main-btn:hover {
+  color: #999999;
+}
+
+.main-btn.active {
+  color: #ffffff;
+  border-bottom-color: #ff6b00;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Sub Menu */
+.sub-menu-group {
+  display: inline-flex;
+  gap: 12px;
+  margin-top: 30px;
+  padding: 0;
+  background: transparent;
+}
+
+.sub-btn {
+  padding: 4px 28px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  color: #666666;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sub-btn:hover {
+  background: #252525;
+  color: #999999;
+  border-color: #3a3a3a;
+}
+
+.sub-btn.active {
+  background: #ff6b00;
+  color: #ffffff;
+  font-weight: 600;
+  border-color: #ff6b00;
+}
+
+/* Glass Card */
+.glass-card {
+  background: #0a0a0a;
+  border-radius: 0;
+  padding: 40px;
+  border: 1px solid #1a1a1a;
+  border-left: 3px solid #ff6b00;
+  margin: 30px 20px;
+  box-shadow: none;
+  color: #ffffff;
+ 
+}
+
+.glass-card h2 {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+  letter-spacing: -0.5px;
+}
+
+.glass-card p {
+  color: #ffffff;
+  line-height: 1.7;
+}
+
+/* 종목 버튼 스타일 - 검은색 텍스트 */
+.glass-card button {
+  color: #000000 !important;
+  background: #e0e0e0;
+  border: 1px solid #cccccc;
+  padding: 3px 16px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  vertical-align:middle;
+  /*height: 1.8rem;*/
+  margin: 4px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.glass-card button:hover {
+  background: #ffffff;
+  border-color: #ff6b00;
+  color: #000000 !important;
+}
+
+/* Table Styles */
+.rs-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.rs-table thead {
+  background: transparent;
+  border-bottom: 2px solid #2a2a2a;
+}
+
+.rs-table th {
+  padding: 16px 20px;
+  text-align: left;
+  color: #666666;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: none;
+}
+
+.rs-table td {
+  padding: 20px;
+  color: #ffffff;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #1a1a1a;
+  transition: background 0.2s ease;
+}
+
+.rs-table tbody tr:hover {
+  background: #0f0f0f;
+}
+
+.rs-table tbody tr {
+  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.rs-table tbody tr:hover {
+  border-left-color: #ff6b00;
+}
+
+/* Ticker and Score Styles */
+.ticker-name {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+}
+
+.high-score {
+  color: #ff6b00;
+  font-weight: 700;
+  background: rgba(255, 107, 0, 0.1);
+  padding: 6px 14px;
+  border-radius: 3px;
+  display: inline-block;
+  border: 1px solid rgba(255, 107, 0, 0.3);
+}
+
+/* Links - 뉴스 링크는 흰색으로 */
+.glass-card a {
+  color: #ffffff;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid transparent;
+  display: block;
+  padding: 15px 0;
+  border-left: 3px solid transparent;
+  padding-left: 15px;
+  margin-left: -15px;
+}
+
+.glass-card a:hover {
+  color: #ff6b00;
+  border-left-color: #ff6b00;
+  background: #0f0f0f;
+}
+
+.glass-card a:visited {
+  color: #cccccc;
+}
+
+/* News Item Styles */
+.news-item {
+  padding: 20px 0;
+  border-bottom: 1px solid #1a1a1a;
+  transition: all 0.2s ease;
+  color: #ffffff;
+}
+
+.news-item:hover {
+  padding-left: 10px;
+  background: #0f0f0f;
+}
+
+.news-title {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.news-meta {
+  color: #666666;
+  font-size: 0.8rem;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.news-source {
+  color: #999999;
+}
+
+.news-time {
+  color: #666666;
+}
+
+/* 일반 텍스트는 흰색 */
+.glass-card div,
+.glass-card span,
+.glass-card li {
+  color: #ffffff;
+}

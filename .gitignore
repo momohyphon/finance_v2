@@ -1,0 +1,9 @@
+# Firebase 보안 (이미 잘 하셨어요)
+*.json
+serviceAccountKey.json
+
+# 추가해야 할 핵심 내용 (이게 없어서 에러가 납니다)
+node_modules/
+.venv/
+__pycache__/
+.DS_Store
