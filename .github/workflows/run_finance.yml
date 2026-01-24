@@ -1,23 +1,24 @@
-name: Daily Finance Update
+name: Finance-Full-Pipeline
 
 on:
   schedule:
-    - cron: '0 0 * * *' # 매일 한국 시간 오전 9시 실행
-  workflow_dispatch: # 수동 실행 버튼 활성화
+    - cron: '*/10 * * * *' # 10분마다 실행
+  workflow_dispatch: # 수동 실행 버튼
 
 jobs:
-  run-script:
+  run-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
+      # --- 파이썬 데이터 수집 ---
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      - name: Install Libraries
+      - name: Install Python Libraries
         run: |
           pip install firebase-admin pandas yfinance finance-datareader pandas-datareader
 
@@ -27,3 +28,18 @@ jobs:
         run: |
           echo "$FIREBASE_KEY" > serviceAccountKey.json
           python finance.py
+
+      # --- 리액트 웹 배포 ---
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Build React
+        run: |
+          cd front
+          npm install
+          npm run build
+
+      - name: Deploy to Firebase Hosting
+        run: npx firebase-tools deploy --only hosting --token "${{ secrets.FIREBASE_TOKEN }}" --non-interactive
