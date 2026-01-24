@@ -1,8 +1,10 @@
 name: Finance-Full-Pipeline
 
-on:
+on: 
+  push:
+    branches: ["main"]
   schedule:
-    - cron: '*/30 * * * *' # 30분마다 실행으로 변경
+    - cron: '*/20 * * * *' # 20분마다 실행으로 변경
   workflow_dispatch: # 수동 실행 버튼
 
 jobs:
