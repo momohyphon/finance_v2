@@ -2,20 +2,26 @@ import pandas as pd
 from datetime import datetime, timedelta
 import numpy as np
 import FinanceDataReader as fdr
-from tabulate import tabulate
 import sys
 import os
 import firebase_admin
 from firebase_admin import credentials, firestore
-import json  # 👈 1. JSON 임포트 추가 완료
+import json
+import pytz # 👈 한국 시간 설정을 위해 추가
+
+# =========================================================================
+# 0. 한국 시간(KST) 설정
+# =========================================================================
+kst = pytz.timezone('Asia/Seoul')
+now_kst = datetime.now(kst)
+END_DATE = now_kst.strftime('%Y-%m-%d')
+NOW_STR = now_kst.strftime('%Y-%m-%d %H:%M')
 
 # =========================================================================
 # 1. 설정 및 종목 리스트
 # =========================================================================
 INDEX_TICKER = 'SPY'
 RS_PERIODS = [180, 90, 60, 30, 10]
-END_DATE_DT = datetime.now().date()
-END_DATE = END_DATE_DT.strftime('%Y-%m-%d')
 
 US_STOCKS_INFO = {
     'MSFT': 'Microsoft Corporation', 'GOOGL': 'Alphabet Inc.', 'META': 'Meta Platforms, Inc.',
@@ -43,13 +49,12 @@ SECTOR_TICKERS = {
 ALL_US_TICKERS = list(US_STOCKS_INFO.keys())
 
 USER_RS_SORT_ORDER = 'a'
-print("자동모드: 정렬기준을 '가중평균(a)로 자동 설정합니다.")
 
 # =========================================================================
 # 2. 데이터 다운로드
 # =========================================================================
-START_DATE_STR = (END_DATE_DT - timedelta(days=max(RS_PERIODS) * 2)).strftime('%Y-%m-%d')
-print(f"💰 미국 데이터 다운로드 중... (Index: {INDEX_TICKER})")
+START_DATE_STR = (now_kst - timedelta(days=max(RS_PERIODS) * 2)).strftime('%Y-%m-%d')
+print(f"💰 미국 데이터 다운로드 중... (Index: {INDEX_TICKER} / 기준일: {NOW_STR})")
 
 try:
     index_data = fdr.DataReader(INDEX_TICKER, start=START_DATE_STR, end=END_DATE)
@@ -82,16 +87,15 @@ def calculate_rs_v2(period, stocks, index):
     scores = (ranks * 98 + 1).round(0).astype('Int64')
     return scores, round(i_ret * 100, 1)
 
-rs_results, idx_rets = {}, {}
+rs_results = {}
 for p in RS_PERIODS:
-    scores, ret = calculate_rs_v2(p, close_prices, index_prices)
-    rs_results[f'RS_{p}D'], idx_rets[p] = scores, ret
+    scores, _ = calculate_rs_v2(p, close_prices, index_prices)
+    rs_results[f'RS_{p}D'] = scores
 
 rs_df = pd.DataFrame(rs_results)
 rs_df['W_RS_Avg'] = rs_df.apply(lambda r: sum(r[c] * 0.2 for c in rs_df.columns if pd.notna(r[c])), axis=1).round(0).astype('Int64')
 rs_df['Ticker'] = rs_df.index
 rs_df['Company Name'] = rs_df['Ticker'].map(US_STOCKS_INFO)
-rs_df['Sector'] = rs_df['Ticker'].map({t: s for s, ts in SECTOR_TICKERS.items() for t in ts})
 
 ma50_latest = close_prices.rolling(window=50).mean().iloc[-1]
 rs_df['Disparity(%)'] = ((close_prices.iloc[-1] / ma50_latest) - 1) * 100
@@ -103,7 +107,7 @@ final_df.index = final_df.index + 1
 # =========================================================================
 # 4. 파이어베이스 전송 및 로컬 파일 저장
 # =========================================================================
-print("\n🇺🇸 [미국 RS] 데이터 전송 및 파일 생성 시작...")
+print(f"\n🇺🇸 [미국 RS] 데이터 전송 및 파일 생성 시작 (시간: {NOW_STR})")
 
 try:
     if not firebase_admin._apps:
@@ -126,9 +130,8 @@ try:
             "disparity": float(row['Disparity(%)'])
         })
     
-    # 전체 데이터 구성
     final_payload = {
-        "update_time": datetime.now().strftime('%Y-%m-%d %H:%M'),
+        "update_time": NOW_STR,  # 👈 한국 시간 적용 완료
         "sort_standard": USER_RS_SORT_ORDER,
         "rankings": us_rank_list
     }
@@ -136,13 +139,11 @@ try:
     # 1. 파이어베이스 업로드
     db.collection('rs_data').document('us_latest').set(final_payload)
     
-    # 2. 🆕 로컬 파일 저장 (리액트 배포용)
+    # 2. 로컬 파일 저장
     with open('rs_us.json', 'w', encoding='utf-8') as f:
         json.dump(final_payload, f, ensure_ascii=False, indent=2)
     
-    print("\n" + "="*50)
-    print("✅ [미국 RS] 파이어베이스 및 rs_us.json 저장 완료!")
-    print("=" *50)
+    print(f"\n✅ [미국 RS] 파이어베이스 및 rs_us.json 저장 완료! (KST: {NOW_STR})")
 
 except Exception as e:
     print(f"\n❌ 전송 실패: {e}")
