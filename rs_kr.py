@@ -2,12 +2,20 @@ import pandas as pd
 from datetime import datetime, timedelta
 import numpy as np
 import FinanceDataReader as fdr
-from tabulate import tabulate
 import sys
 import os
 import firebase_admin
 from firebase_admin import credentials, firestore
-import json  # 👈 1. JSON 임포트 추가 완료
+import json
+import pytz  # 👈 시간대 설정을 위해 추가
+
+# =========================================================================
+# 0. 한국 시간(KST) 설정
+# =========================================================================
+kst = pytz.timezone('Asia/Seoul')
+now_kst = datetime.now(kst)
+END_DATE = now_kst.strftime('%Y-%m-%d')
+NOW_STR = now_kst.strftime('%Y-%m-%d %H:%M')
 
 # =========================================================================
 # 1. 설정 변수 및 종목 리스트 강제 지정
@@ -15,18 +23,15 @@ import json  # 👈 1. JSON 임포트 추가 완료
 INDEX_TICKER = 'KS11'
 RS_PERIODS = [180, 90, 60, 30, 10]
 TOP_N = 50
-END_DATE_DT = datetime.now().date()
-END_DATE = END_DATE_DT.strftime('%Y-%m-%d')
 
-print("🔍 한글 종목명 사전 자동 생성 중...")
+print(f"🔍 한국 RS 데이터 계산 시작 (기준 시간: {NOW_STR})")
+
 try:
     krx_list = fdr.StockListing('KRX')[['Code', 'Name']]
     K_NAME_DICT = dict(pd.Series(krx_list.Name.values, index=krx_list.Code.values))
 except:
     print("⚠️ 상장사 리스트를 가져오지 못했습니다.")
     K_NAME_DICT = {}
-
-USER_RS_SORT_ORDER = 'a'
 
 raw_data = """
 005930,Samsung Electronics
@@ -99,7 +104,7 @@ KOSPI_TICKERS = KOSPI_TICKERS[:TOP_N]
 # 2. 데이터 다운로드
 # =========================================================================
 MAX_LOOKBACK_DAYS = (max(RS_PERIODS) + 60) * 2
-START_DATE_STR = (END_DATE_DT - timedelta(days=MAX_LOOKBACK_DAYS)).strftime('%Y-%m-%d')
+START_DATE_STR = (now_kst - timedelta(days=MAX_LOOKBACK_DAYS)).strftime('%Y-%m-%d')
 
 try:
     index_data = fdr.DataReader(INDEX_TICKER, start=START_DATE_STR, end=END_DATE)
@@ -121,7 +126,7 @@ close_prices_final = close_prices_raw.ffill()
 index_prices_final = index_prices_raw.reindex(close_prices_final.index).ffill()
 
 # =========================================================================
-# 3. RS 계산 및 출력
+# 3. RS 계산
 # =========================================================================
 def calculate_period_rs(period, close_prices, index_prices):
     if len(close_prices) < period + 1:
@@ -137,10 +142,10 @@ def calculate_period_rs(period, close_prices, index_prices):
     scores = (ranks * 98 + 1).round(0).astype('Int64')
     return scores, round(ret_index * 100, 1)
 
-rs_results, idx_rets = {}, {}
+rs_results = {}
 for p in RS_PERIODS:
-    scores, idx_ret = calculate_period_rs(p, close_prices_final, index_prices_final)
-    rs_results[f'RS_{p}D'], idx_rets[p] = scores, idx_ret
+    scores, _ = calculate_period_rs(p, close_prices_final, index_prices_final)
+    rs_results[f'RS_{p}D'] = scores
 
 rs_df = pd.DataFrame(rs_results)
 weights = {'RS_180D': 0.2, 'RS_90D': 0.2, 'RS_60D': 0.2, 'RS_30D': 0.2, 'RS_10D': 0.2}
@@ -151,9 +156,9 @@ final_df = rs_df.sort_values(by='W_RS_Avg', ascending=False).reset_index().renam
 final_df.index = final_df.index + 1
 
 # =========================================================================
-# 4. 파이어베이스 전송 및 [핵심] 로컬 파일 저장
+# 4. 파이어베이스 전송 및 로컬 파일 저장
 # =========================================================================
-print("\n🚀 [한국 RS] 데이터 전송 및 파일 생성 시작...")
+print(f"🚀 [한국 RS] 데이터 전송 및 파일 생성 시작 (시간: {NOW_STR})")
 
 try:
     if not firebase_admin._apps:
@@ -177,22 +182,19 @@ try:
             "disparity": float(row['Disparity(%)']),
         })
 
-    # 전체 데이터 구성
     final_payload = {
-        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "update_time": NOW_STR,  # 👈 한국 시간 적용
         "rankings": kr_rank_list
     }
 
     # 1. 파이어베이스 업로드
     db.collection('rs_data').document('latest').set(final_payload)
 
-    # 2. 🆕 로컬 파일 저장 (여기서 파일이 생겨야 액션이 성공함!)
+    # 2. 로컬 파일 저장
     with open('rs_kr.json', 'w', encoding='utf-8') as f:
         json.dump(final_payload, f, ensure_ascii=False, indent=2)
 
-    print("\n" + "=" * 50)
-    print("✅ 파이어베이스 전송 & rs_kr.json 파일 생성 성공!")
-    print("=" * 50)
+    print(f"✅ 파이어베이스 전송 & rs_kr.json 파일 생성 성공! (KST: {NOW_STR})")
 
 except Exception as e:
-    print(f"\n❌ 에러 발생: {e}")
+    print(f"❌ 에러 발생: {e}")
