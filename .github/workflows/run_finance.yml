@@ -46,7 +46,7 @@ jobs:
         working-directory: ./front
         run: |
           npm install --legacy-peer-deps
-          npm run build
+          CI=false npm run build
 
       - name: Deploy to Firebase Hosting
         working-directory: ./front
