@@ -7,6 +7,7 @@ from firebase_admin import credentials, firestore
 import time
 import os
 import json
+import pytz
 
 # 1. 파이어베이스 초기화 (깃허브/로컬 공용)
 if not firebase_admin._apps:
@@ -30,7 +31,8 @@ if not doc.exists:
     exit()
 
 rankings = doc.to_dict().get('rankings', [])
-now_str = datetime.now().strftime('%Y-%m-%d %H:%M')
+kst = pytz.timezone('Asia/Seoul')
+now_str = datetime.now(kst).strftime('%Y-%m-%d %H:%M')
 fields_to_add = {}
 
 print(f"📰 한국 뉴스 30개 수집 시작: {now_str}")
@@ -59,8 +61,9 @@ for item in rankings:
             raw_date = i.pubDate.text
             try:
                 dt_obj = datetime.strptime(raw_date, '%a, %d %b %Y %H:%M:%S %Z')
+                dt_obj = dt_obj.replace(tzinfo=pytz.UTC).astimezone(kst)
             except:
-                dt_obj = datetime.now() # 변환 실패 시 현재시간
+                dt_obj = datetime.now(kst) # 변환 실패 시 현재시간
 
             articles.append({
                 "title": title,
