@@ -7,6 +7,7 @@ from firebase_admin import credentials, firestore
 import time
 import os
 import sys
+import json
 
 # 1. 파이어베이스 인증 (경로 최적화: 깃허브 액션 & 로컬 겸용)
 JSON_PATH = r"c:\Users\gwak\Finance_Final_V2\serviceAccountKey.json"
@@ -94,4 +95,6 @@ for item in rankings:
 
 # 3. 파이어베이스에 한 번에 저장
 db.collection('stock_news').document('news_us').set(fields_to_add)
+with open('news_us.json', 'w', encoding='utf-8') as f:
+    json.dump(fields_to_add, f, ensure_ascii=False, indent=2)
 print(f"🚀 [완료] news_us 문서 업데이트 완료!")
