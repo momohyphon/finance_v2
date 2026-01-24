@@ -4,8 +4,8 @@ on:
   push:
     branches: ["main"]
   schedule:
-    - cron: '*/20 * * * *' # 20분마다 실행으로 변경
-  workflow_dispatch: # 수동 실행 버튼
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
 
 jobs:
   run-and-deploy:
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # --- 파이썬 데이터 수집 ---
+      # 1. 파이썬 환경 세팅
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -24,19 +24,28 @@ jobs:
         run: |
           pip install firebase-admin pandas yfinance finance-datareader pandas-datareader requests beautifulsoup4 lxml tabulate scipy
 
+      # 2. 모든 데이터 수집 스크립트 실행 (금융지표, 뉴스, RS 순위)
       - name: Run All Script
         env:
           FIREBASE_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: |
           echo "$FIREBASE_KEY" > serviceAccountKey.json
           python finance.py
-          # 파일명에 점(.)이 아니라 언더바(_)가 맞는지 확인하고 수정하세요!
           python news_kr.py 
           python news_us.py
           python rs_kr.py
           python rs_us.py
 
-      # --- 리액트 웹 배포 ---
+      # 3. [핵심] 생성된 모든 데이터 파일을 리액트 소스 폴더로 강제 이동
+      - name: Move All Data to React
+        run: |
+          mkdir -p front/src/data
+          # 파이썬이 생성한 모든 json과 csv 파일을 리액트 데이터 폴더로 복사합니다.
+          cp -f *.json front/src/data/ 2>/dev/null || true
+          cp -f *.csv front/src/data/ 2>/dev/null || true
+          echo "Data migration complete."
+
+      # 4. 리액트 빌드 및 배포 (이제 최신 데이터를 가지고 빌드함)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
