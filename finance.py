@@ -100,6 +100,10 @@ for name, (symbol, link) in tickers.items():
 
 # 파이어베이스 전송
 db.collection('market_data').document('global_indices').set(finance_payload)
+
+# 로컬 JSON 파일 저장 (GitHub Actions용)
 with open('market_data.json', 'w', encoding='utf-8') as f:
     json.dump(finance_payload, f, ensure_ascii=False, indent=2)
+
 print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+print("✅ Firebase 및 로컬 JSON 저장 완료!")
