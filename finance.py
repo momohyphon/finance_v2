@@ -1,10 +1,17 @@
 import FinanceDataReader as fdr
 from pandas_datareader import data as pdr
 import datetime
+from datetime import timezone, timedelta
 import firebase_admin
 from firebase_admin import credentials, firestore
 import time
 import json
+
+
+def get_kst_now():
+    KST = timezone(timedelta(hours=9))
+    return datetime.datetime.now(KST)
+
 
 # 1. 파이어베이스 초기화
 if not firebase_admin._apps:
@@ -21,7 +28,7 @@ print("🚀 금융 데이터 자동 업데이트 프로그램을 시작합니다
 
 # 데이터 구조 초기화
 finance_payload = {
-    "update_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+    "update_time": get_kst_now().strftime("%Y-%m-%d %H:%M"),
     "bonds": {},
     "items": []
 }
@@ -32,7 +39,7 @@ end = datetime.datetime.now()
 
 # --- [1] 금리 데이터 수집 및 출력 ---
 print(f"\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print(f"📊 업데이트 시간: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+print(f"📊 업데이트 시간: {get_kst_now().strftime('%Y-%m-%d %H:%M:%S')}")
 print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 
 # 2년물
