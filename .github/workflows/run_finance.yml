@@ -44,7 +44,6 @@ jobs:
 
       - name: Build React
         run: |
-          cd front
           npm install
           npm run build
 
