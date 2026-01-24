@@ -22,7 +22,7 @@ jobs:
 
       - name: Install Python Libraries
         run: |
-          pip install firebase-admin pandas yfinance finance-datareader pandas-datareader requests beautifulsoup4 lxml
+          pip install firebase-admin pandas yfinance finance-datareader pandas-datareader requests beautifulsoup4 lxml tabulate scipy
 
       - name: Run All Script
         env:
