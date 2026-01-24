@@ -30,7 +30,7 @@ function App() {
     onSnapshot(doc(db, 'rs_data', 'latest'), (d) => setKrRank(d.data()?.rankings || []));
     onSnapshot(doc(db, 'rs_data', 'us_latest'), (d) => setUsRank(d.data()?.rankings || []));
     
-  })
+  },[])
 
     return (  
       <div className = "dashboard">

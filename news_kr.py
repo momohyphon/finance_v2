@@ -6,46 +6,33 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 import time
 import os
-import sys
 
-# --- [수정] 파일 경로를 절대 경로로 고정하여 어디서든 실행 가능하게 만듦 ---
-# 사용자님의 환경에 맞춘 실제 경로입니다.
-JSON_PATH = r"c:\Users\gwak\Finance_Final_V2\serviceAccountKey.json"
-
+# 1. 파이어베이스 초기화 (깃허브/로컬 공용)
 if not firebase_admin._apps:
     try:
-        # 파일이 실제로 있는지 확인부터 합니다.
-        if os.path.exists(JSON_PATH):
-            cred = credentials.Certificate(JSON_PATH)
-            firebase_admin.initialize_app(cred)
-            print("✅ 파이어베이스 인증 성공")
-        else:
-            print(f"❌ 인증 파일을 찾을 수 없습니다: {JSON_PATH}")
-            # 파일 위치가 다를 경우를 대비해 현재 실행 폴더의 파일이라도 시도
+        # 1순위: 깃허브 액션용(현재 폴더), 2순위: 오빠 PC 절대 경로
+        if os.path.exists("serviceAccountKey.json"):
             cred = credentials.Certificate("serviceAccountKey.json")
-            firebase_admin.initialize_app(cred)
+        else:
+            cred = credentials.Certificate(r"c:\Users\gwak\Finance_Final_V2\serviceAccountKey.json")
+        firebase_admin.initialize_app(cred)
+        print("✅ 파이어베이스 인증 성공")
     except Exception as e:
         print(f"❌ 파이어베이스 초기화 실패: {e}")
 
 db = firestore.client()
 
-# 2. 메인 실행 루프
-print("🚀 한국 뉴스 자동 업데이트를 시작합니다.")
-
-
-# rs_data/latest 문서 가져오기 (리액트 연동 구조 유지)
+# 2. RS 데이터에서 상위 종목 가져오기
 doc = db.collection('rs_data').document('latest').get()
 if not doc.exists:
-    print("❌ rs_data/latest 문서가 없습니다. 1분 후 재시도.")
-    sys.exit()
+    print("❌ rs_data/latest 문서가 없습니다.")
+    exit()
 
 rankings = doc.to_dict().get('rankings', [])
 now_str = datetime.now().strftime('%Y-%m-%d %H:%M')
 fields_to_add = {}
 
-print(f"\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print(f"📰 뉴스 수집 시작: {now_str}")
-print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+print(f"📰 한국 뉴스 30개 수집 시작: {now_str}")
 
 for item in rankings:
     code = item['code']
@@ -53,30 +40,48 @@ for item in rankings:
     field_key = f"{code}_{name}"
     
     try:
+        # 구글 뉴스 RSS (검색어 기반)
         url = f"https://news.google.com/rss/search?q={quote_plus(name)}&hl=ko&gl=KR&ceid=KR:ko"
-        res = requests.get(url, timeout=5)
+        res = requests.get(url, timeout=10)
         soup = BeautifulSoup(res.content, "xml")
-        items = soup.find_all("item")[:20]
+        items = soup.find_all("item")
 
         articles = []
         for i in items:
+            # RSS 날짜 형식: "Sat, 24 Jan 2026 07:00:00 GMT"
+            # 이를 파이썬 날짜 객체로 변환해서 정렬에 사용
+            raw_date = i.pubDate.text
+            try:
+                dt_obj = datetime.strptime(raw_date, '%a, %d %b %Y %H:%M:%S %Z')
+            except:
+                dt_obj = datetime.now() # 변환 실패 시 현재시간
+
             articles.append({
                 "title": i.title.text,
                 "link": i.link.text,
                 "publisher": i.source.text if i.source else "Google News",
-                "time": i.pubDate.text
+                "time": dt_obj.strftime('%Y-%m-%d %H:%M'), # 리액트에서 보기 편한 형식
+                "dt_index": dt_obj # 정렬용 임시 필드
             })
+
+        # --- [핵심] 최신순 정렬 후 상위 30개만 자르기 ---
+        articles.sort(key=lambda x: x['dt_index'], reverse=True)
+        final_articles = articles[:30]
+
+        # 정렬용 임시 필드 삭제 후 저장
+        for a in final_articles: del a['dt_index']
 
         fields_to_add[field_key] = {
             "update_time": now_str,
-            "articles": articles
+            "articles": final_articles
         }
-        print(f" > {name}({code}) 완료")
-        time.sleep(0.3)
+        print(f" > {name}({code}) 최신 뉴스 30개 완료")
+        time.sleep(0.5) # 구글 차단 방지
+
     except Exception as e:
         print(f" > {name} 오류: {e}")
 
-# 리액트가 읽는 문서에 덮어쓰기
+# 3. 파이어베이스 전송
 db.collection('stock_news').document('news_kr').set(fields_to_add)
-
-
+print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+print("✅ 모든 한국 뉴스 업데이트 완료")

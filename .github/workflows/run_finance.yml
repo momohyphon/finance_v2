@@ -2,7 +2,7 @@ name: Finance-Full-Pipeline
 
 on:
   schedule:
-    - cron: '*/10 * * * *' # 10분마다 실행
+    - cron: '*/30 * * * *' # 30분마다 실행으로 변경
   workflow_dispatch: # 수동 실행 버튼
 
 jobs:
@@ -22,12 +22,17 @@ jobs:
         run: |
           pip install firebase-admin pandas yfinance finance-datareader pandas-datareader
 
-      - name: Run Finance Script
+      - name: Run All Script
         env:
           FIREBASE_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: |
           echo "$FIREBASE_KEY" > serviceAccountKey.json
           python finance.py
+          # 파일명에 점(.)이 아니라 언더바(_)가 맞는지 확인하고 수정하세요!
+          python news_kr.py 
+          python news_us.py
+          python rs_kr.py
+          python rs_us.py
 
       # --- 리액트 웹 배포 ---
       - name: Setup Node.js
