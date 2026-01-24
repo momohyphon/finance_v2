@@ -47,9 +47,14 @@ for item in rankings:
         items = soup.find_all("item")
 
         articles = []
+        seen_titles = set()
         for i in items:
             # RSS 날짜 형식: "Sat, 24 Jan 2026 07:00:00 GMT"
             # 이를 파이썬 날짜 객체로 변환해서 정렬에 사용
+            title = i.title.text.strip()
+            if title in seen_titles:
+                continue
+            seen_titles.add(title)
             raw_date = i.pubDate.text
             try:
                 dt_obj = datetime.strptime(raw_date, '%a, %d %b %Y %H:%M:%S %Z')
@@ -57,7 +62,7 @@ for item in rankings:
                 dt_obj = datetime.now() # 변환 실패 시 현재시간
 
             articles.append({
-                "title": i.title.text,
+                "title": title,
                 "link": i.link.text,
                 "publisher": i.source.text if i.source else "Google News",
                 "time": dt_obj.strftime('%Y-%m-%d %H:%M'), # 리액트에서 보기 편한 형식
@@ -66,7 +71,7 @@ for item in rankings:
 
         # --- [핵심] 최신순 정렬 후 상위 30개만 자르기 ---
         articles.sort(key=lambda x: x['dt_index'], reverse=True)
-        final_articles = articles[:30]
+        final_articles = articles[:20]
 
         # 정렬용 임시 필드 삭제 후 저장
         for a in final_articles: del a['dt_index']
@@ -75,7 +80,7 @@ for item in rankings:
             "update_time": now_str,
             "articles": final_articles
         }
-        print(f" > {name}({code}) 최신 뉴스 30개 완료")
+        print(f" > {name}({code}) 최신 뉴스 {len(final_articles)}개 완료")
         time.sleep(0.5) # 구글 차단 방지
 
     except Exception as e:
