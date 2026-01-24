@@ -44,7 +44,7 @@ jobs:
 
       - name: Build React
         run: |
-          npm install
+          npm install --legacy-peer-deps
           npm run build
 
       - name: Deploy to Firebase Hosting
