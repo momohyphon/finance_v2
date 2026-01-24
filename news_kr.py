@@ -6,6 +6,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 import time
 import os
+import json
 
 # 1. 파이어베이스 초기화 (깃허브/로컬 공용)
 if not firebase_admin._apps:
@@ -88,5 +89,7 @@ for item in rankings:
 
 # 3. 파이어베이스 전송
 db.collection('stock_news').document('news_kr').set(fields_to_add)
+with open('news_kr.json', 'w', encoding='utf-8') as f:
+    json.dump(fields_to_add, f, ensure_ascii=False, indent=2)
 print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 print("✅ 모든 한국 뉴스 업데이트 완료")
