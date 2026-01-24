@@ -4,6 +4,7 @@ import datetime
 import firebase_admin
 from firebase_admin import credentials, firestore
 import time
+import json
 
 # 1. 파이어베이스 초기화
 if not firebase_admin._apps:
@@ -99,4 +100,6 @@ for name, (symbol, link) in tickers.items():
 
 # 파이어베이스 전송
 db.collection('market_data').document('global_indices').set(finance_payload)
+with open('market_data.json', 'w', encoding='utf-8') as f:
+    json.dump(finance_payload, f, ensure_ascii=False, indent=2)
 print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
