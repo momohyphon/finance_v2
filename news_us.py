@@ -8,9 +8,11 @@ import time
 import os
 import sys
 import json
+import pytz # 👈 시간대 변환을 위해 필수
 
-# 1. 파이어베이스 인증 (경로 최적화: 깃허브 액션 & 로컬 겸용)
+# 1. 파이어베이스 인증 (경로 최적화)
 JSON_PATH = r"c:\Users\gwak\Finance_Final_V2\serviceAccountKey.json"
+kst = pytz.timezone('Asia/Seoul') # 한국 시간대 설정
 
 if not firebase_admin._apps:
     try:
@@ -19,7 +21,6 @@ if not firebase_admin._apps:
             firebase_admin.initialize_app(cred)
             print("✅ 미국뉴스: 로컬 인증 성공")
         else:
-            # 깃허브 액션 서버 환경일 경우
             cred = credentials.Certificate("serviceAccountKey.json")
             firebase_admin.initialize_app(cred)
             print("✅ 미국뉴스: 깃허브 서버 인증 성공")
@@ -35,10 +36,11 @@ if not doc.exists:
     sys.exit()
 
 rankings = doc.to_dict().get('rankings', [])
-now_str = datetime.now().strftime('%Y-%m-%d %H:%M')
+# 업데이트 시간도 한국 시간으로 설정
+now_str = datetime.now(kst).strftime('%Y-%m-%d %H:%M')
 fields_to_add = {}
 
-print(f"🇺🇸 미국 뉴스 30개 최신순 검색 시작 ({len(rankings)}개 종목)")
+print(f"🇺🇸 미국 뉴스 최신순 검색 시작 (한국시간 기준: {now_str})")
 
 for item in rankings:
     code = item.get('code') or item.get('ticker')
@@ -59,27 +61,28 @@ for item in rankings:
             if title in seen_titles:
                 continue
             seen_titles.add(title)
-            # RSS 날짜 형식 예: "Sat, 24 Jan 2026 07:00:00 GMT"
+            
             raw_date = i.pubDate.text
             try:
-                # 글자로 된 날짜를 파이썬 시간 객체로 변환 (정렬용)
+                # 1. 구글 RSS 시간(GMT)을 파이썬 객체로 변환
                 dt_obj = datetime.strptime(raw_date, '%a, %d %b %Y %H:%M:%S %Z')
+                # 2. GMT 시간을 한국 시간(KST)으로 강제 변환
+                dt_obj = dt_obj.replace(tzinfo=pytz.UTC).astimezone(kst)
             except:
-                dt_obj = datetime.now()
+                dt_obj = datetime.now(kst)
 
             articles.append({
                 "title": title,
                 "link": i.link.text,
                 "publisher": i.source.text if i.source else "Google News",
-                "time": dt_obj.strftime('%Y-%m-%d %H:%M'), # 사람이 읽기 편한 시간
-                "dt_index": dt_obj # 정렬을 위한 임시 필드
+                "time": dt_obj.strftime('%Y-%m-%d %H:%M'), # 한국 시간 포맷
+                "dt_index": dt_obj # 정렬용
             })
 
-        # 🔥 [핵심] 시간순으로 정렬 (최신이 맨 위로) 후 30개만 자르기
+        # 🔥 최신순 정렬 (한국 시간 기준) 후 상위 20개
         articles.sort(key=lambda x: x['dt_index'], reverse=True)
         final_articles = articles[:20]
 
-        # 저장할 때는 정렬용 임시 필드 삭제
         for a in final_articles: del a['dt_index']
 
         fields_to_add[field_key] = {
@@ -87,14 +90,17 @@ for item in rankings:
             "articles": final_articles
         }
         
-        print(f"✅ {name}({code}) 최신 뉴스 {len(final_articles)}개 완료")
-        time.sleep(0.5) # 구글 차단 방지용
+        print(f"✅ {name}({code}) 뉴스 {len(final_articles)}개 완료")
+        time.sleep(0.5)
 
     except Exception as e:
         print(f"❌ {name} 뉴스 에러: {e}")
 
-# 3. 파이어베이스에 한 번에 저장
-db.collection('stock_news').document('news_us').set(fields_to_add)
-with open('news_us.json', 'w', encoding='utf-8') as f:
-    json.dump(fields_to_add, f, ensure_ascii=False, indent=2)
-print(f"🚀 [완료] news_us 문서 업데이트 완료!")
+# 3. 파이어베이스 및 로컬 JSON 저장
+try:
+    db.collection('stock_news').document('news_us').set(fields_to_add)
+    with open('news_us.json', 'w', encoding='utf-8') as f:
+        json.dump(fields_to_add, f, ensure_ascii=False, indent=2)
+    print(f"🚀 [완료] news_us 업데이트 완료 (KST 기준)")
+except Exception as e:
+    print(f"❌ 저장 실패: {e}")
