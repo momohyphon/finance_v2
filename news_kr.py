@@ -8,11 +8,11 @@ import time
 import os
 import json
 import pytz
+import sys
 
-# 1. 파이어베이스 초기화 (깃허브/로컬 공용)
+# 1. 파이어베이스 초기화 (원본 경로 및 로직 유지)
 if not firebase_admin._apps:
     try:
-        # 1순위: 깃허브 액션용(현재 폴더), 2순위: 오빠 PC 절대 경로
         if os.path.exists("serviceAccountKey.json"):
             cred = credentials.Certificate("serviceAccountKey.json")
         else:
@@ -21,6 +21,7 @@ if not firebase_admin._apps:
         print("✅ 파이어베이스 인증 성공")
     except Exception as e:
         print(f"❌ 파이어베이스 초기화 실패: {e}")
+        sys.exit(1)
 
 db = firestore.client()
 
@@ -28,13 +29,14 @@ db = firestore.client()
 doc = db.collection('rs_data').document('latest').get()
 if not doc.exists:
     print("❌ rs_data/latest 문서가 없습니다.")
-    exit()
+    sys.exit(0)
 
 rankings = doc.to_dict().get('rankings', [])
 kst = pytz.timezone('Asia/Seoul')
 now_str = datetime.now(kst).strftime('%Y-%m-%d %H:%M')
 fields_to_add = {}
 
+# 오빠 원본 문구 그대로 유지
 print(f"📰 한국 뉴스 30개 수집 시작: {now_str}")
 
 for item in rankings:
@@ -43,7 +45,6 @@ for item in rankings:
     field_key = f"{code}_{name}"
     
     try:
-        # 구글 뉴스 RSS (검색어 기반)
         url = f"https://news.google.com/rss/search?q={quote_plus(name)}&hl=ko&gl=KR&ceid=KR:ko"
         res = requests.get(url, timeout=10)
         soup = BeautifulSoup(res.content, "xml")
@@ -52,8 +53,6 @@ for item in rankings:
         articles = []
         seen_titles = set()
         for i in items:
-            # RSS 날짜 형식: "Sat, 24 Jan 2026 07:00:00 GMT"
-            # 이를 파이썬 날짜 객체로 변환해서 정렬에 사용
             title = i.title.text.strip()
             if title in seen_titles:
                 continue
@@ -63,21 +62,20 @@ for item in rankings:
                 dt_obj = datetime.strptime(raw_date, '%a, %d %b %Y %H:%M:%S %Z')
                 dt_obj = dt_obj.replace(tzinfo=pytz.UTC).astimezone(kst)
             except:
-                dt_obj = datetime.now(kst) # 변환 실패 시 현재시간
+                dt_obj = datetime.now(kst)
 
             articles.append({
                 "title": title,
                 "link": i.link.text,
                 "publisher": i.source.text if i.source else "Google News",
-                "time": dt_obj.strftime('%Y-%m-%d %H:%M'), # 리액트에서 보기 편한 형식
-                "dt_index": dt_obj # 정렬용 임시 필드
+                "time": dt_obj.strftime('%Y-%m-%d %H:%M'),
+                "dt_index": dt_obj
             })
 
-        # --- [핵심] 최신순 정렬 후 상위 30개만 자르기 ---
+        # --- [원본 유지] 최신순 정렬 후 상위 20개 추출 ---
         articles.sort(key=lambda x: x['dt_index'], reverse=True)
         final_articles = articles[:20]
 
-        # 정렬용 임시 필드 삭제 후 저장
         for a in final_articles: del a['dt_index']
 
         fields_to_add[field_key] = {
@@ -85,14 +83,17 @@ for item in rankings:
             "articles": final_articles
         }
         print(f" > {name}({code}) 최신 뉴스 {len(final_articles)}개 완료")
-        time.sleep(0.5) # 구글 차단 방지
+        time.sleep(0.5)
 
     except Exception as e:
         print(f" > {name} 오류: {e}")
 
-# 3. 파이어베이스 전송
-db.collection('stock_news').document('news_kr').set(fields_to_add)
-with open('news_kr.json', 'w', encoding='utf-8') as f:
-    json.dump(fields_to_add, f, ensure_ascii=False, indent=2)
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("✅ 모든 한국 뉴스 업데이트 완료")
+# 3. 파이어베이스 전송 (오빠가 지정한 경로 고정)
+try:
+    db.collection('stock_news').document('news_kr').set(fields_to_add)
+    with open('news_kr.json', 'w', encoding='utf-8') as f:
+        json.dump(fields_to_add, f, ensure_ascii=False, indent=2)
+    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    print("✅ 모든 한국 뉴스 업데이트 완료")
+except Exception as e:
+    print(f"❌ 저장 오류: {e}")
