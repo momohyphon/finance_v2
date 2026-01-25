@@ -1,0 +1,94 @@
+{
+  "update_time": "2026-01-25 19:36",
+  "bonds": {
+    "2Y_val": 3.61,
+    "2Y_chg": 0.28,
+    "2Y_link": "https://finance.yahoo.com/quote/ZT=F/",
+    "10Y_val": 4.24,
+    "10Y_chg": -0.24,
+    "10Y_link": "https://finance.yahoo.com/quote/%5ETNX/",
+    "30Y_val": 4.83,
+    "30Y_chg": -0.29,
+    "30Y_link": "https://finance.yahoo.com/quote/%5ETYX/"
+  },
+  "items": [
+    {
+      "name": "달러 인덱스",
+      "price": 97.4,
+      "change": -0.79,
+      "Link": "https://finance.yahoo.com/quote/DX-Y.NYB/"
+    },
+    {
+      "name": "나스닥 지수",
+      "price": 23501.24,
+      "change": 0.28,
+      "Link": "https://finance.yahoo.com/quote/^IXIC/"
+    },
+    {
+      "name": "S&P500 지수",
+      "price": 6915.61,
+      "change": 0.03,
+      "Link": "https://finance.yahoo.com/quote/^GSPC/"
+    },
+    {
+      "name": "나스닥 선물",
+      "price": 25738.25,
+      "change": 0.31,
+      "Link": "https://finance.yahoo.com/quote/NQ=F/"
+    },
+    {
+      "name": "S&P500 선물",
+      "price": 6945.75,
+      "change": 0.01,
+      "Link": "https://finance.yahoo.com/quote/ES=F/"
+    },
+    {
+      "name": "WTI 유가",
+      "price": 61.07,
+      "change": 2.88,
+      "Link": "https://finance.yahoo.com/quote/CL=F/"
+    },
+    {
+      "name": "금 가격",
+      "price": 4979.7,
+      "change": 1.44,
+      "Link": "https://finance.yahoo.com/quote/GC=F/"
+    },
+    {
+      "name": "비트코인",
+      "price": 88430.16,
+      "change": -0.76,
+      "Link": "https://finance.yahoo.com/quote/BTC-USD/"
+    },
+    {
+      "name": "반도체(SOXX)",
+      "price": 344.71,
+      "change": -1.14,
+      "Link": "https://finance.yahoo.com/quote/SOXX/"
+    },
+    {
+      "name": "철강(SLX)",
+      "price": 95.2,
+      "change": 1.47,
+      "Link": "https://finance.yahoo.com/quote/SLX/"
+    },
+    {
+      "name": "구리 가격",
+      "price": 5.95,
+      "change": 3.57,
+      "Link": "https://finance.yahoo.com/quote/HG=F/"
+    },
+    {
+      "name": "환율(엔화)",
+      "price": 158.501,
+      "change": 0.03,
+      "Link": "https://finance.yahoo.com/quote/JPY%3DX/"
+    },
+    {
+      "name": "환율(원화)",
+      "price": 1463.26,
+      "change": -0.11,
+      "Link": "https://finance.yahoo.com/quote/KRW=X/"
+    }
+  ]
+}
