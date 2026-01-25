@@ -1,30 +1,34 @@
 name: Finance-Full-Pipeline
 
-on: 
+on:
   push:
-    branches: ["main"]
+    branches: 
+      - main
   schedule:
-    - cron: '*/20 * * * *'
-  workflow_dispatch:
+    - cron: '*/20 * * * *'  # 매 20분마다 실행
+  workflow_dispatch:  # 수동 실행 허용
 
 jobs:
   run-and-deploy:
     runs-on: ubuntu-latest
+    
     steps:
+      # 1. 코드 체크아웃
       - name: Checkout Code
         uses: actions/checkout@v4
-
-      # 1. 파이썬 환경 세팅
+      
+      # 2. Python 환경 설정
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-
+      
+      # 3. Python 라이브러리 설치
       - name: Install Python Libraries
         run: |
-          pip install firebase-admin pandas yfinance finance-datareader pandas-datareader requests beautifulsoup4 lxml tabulate scipy
-
-      # 2. 모든 데이터 수집 스크립트 실행 (금융지표, 뉴스, RS 순위)
+          pip install firebase-admin pandas yfinance finance-datareader pandas-datareader requests beautifulsoup4 lxml tabulate scipy pytz
+      
+      # 4. 데이터 수집 스크립트 실행
       - name: Run All Script
         env:
           FIREBASE_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -35,28 +39,30 @@ jobs:
           python news_us.py
           python rs_kr.py
           python rs_us.py
-
-      # 3. [핵심] 생성된 모든 데이터 파일을 리액트 소스 폴더로 강제 이동
+      
+      # 5. 생성된 JSON 파일을 React 소스로 이동
       - name: Move All Data to React
         run: |
           mkdir -p front/src/data
-          # 파이썬이 생성한 모든 json과 csv 파일을 리액트 데이터 폴더로 복사합니다.
           cp -f *.json front/src/data/ 2>/dev/null || true
           cp -f *.csv front/src/data/ 2>/dev/null || true
-          echo "Data migration complete."
-
-      # 4. 리액트 빌드 및 배포 (이제 최신 데이터를 가지고 빌드함)
+          echo "✅ Data migration complete."
+      
+      # 6. Node.js 환경 설정
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
+      
+      # 7. React 빌드
       - name: Build React
         working-directory: ./front
         run: |
           npm install --legacy-peer-deps
           CI=false npm run build
-
+      
+      # 8. Firebase Hosting 배포
       - name: Deploy to Firebase Hosting
         working-directory: ./front
-        run: npx firebase-tools deploy --only hosting --token "${{ secrets.FIREBASE_TOKEN }}" --non-interactive
+        run: |
+          npx firebase-tools deploy --only hosting --token "${{ secrets.FIREBASE_TOKEN }}" --non-interactive
