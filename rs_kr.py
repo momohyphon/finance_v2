@@ -83,6 +83,7 @@ raw_data = """
 326030,SK Biopharm 
 047050,POSCO International
 090430,Amorepacific
+009540, HD Korea Shipbuilding
 """
 
 USER_ENGLISH_NAMES = {}

@@ -24,28 +24,48 @@ INDEX_TICKER = 'SPY'
 RS_PERIODS = [180, 90, 60, 30, 10]
 
 US_STOCKS_INFO = {
-    'MSFT': 'Microsoft Corporation', 'GOOGL': 'Alphabet Inc.', 'META': 'Meta Platforms, Inc.',
-    'NVDA': 'NVIDIA Corporation', 'AAPL': 'Apple Inc.', 'AMD': 'Advanced Micro Devices',
-    'AVGO': 'Broadcom Inc.', 'MU': 'Micron Technology', 'LLY': 'Eli Lilly and Company',
-    'MRNA': 'Moderna, Inc.', 'PFE': 'Pfizer Inc.', 'JNJ': 'Johnson & Johnson',
-    'AMZN': 'Amazon.com, Inc.', 'WMT': 'Walmart Inc.', 'TSLA': 'Tesla, Inc.',
-    'GM': 'General Motors', 'F': 'Ford Motor Company', 'MGM': 'MGM Resorts International',
-    'MAR': 'Marriott International', 'JPM': 'JPMorgan Chase & Co.', 'V': 'Visa Inc.',
-    'BAC': 'Bank of America', 'XOM': 'Exxon Mobil Corporation', 'CVX': 'Chevron Corporation',
-    'SLB': 'Schlumberger Limited', 'ALB': 'Albemarle Corporation', 'RIO': 'Rio Tinto Group',
-    'NEM': 'Newmont Corporation', 'DOW': 'Dow Inc.', 'NUE': 'Nucor Corporation',
-    'CAT': 'Caterpillar Inc.', 'DE': 'John Deere & Co.', 'LMT': 'Lockheed Martin',
-    'RTX': 'RTX Corporation'
+    # 원전 & 에너지
+    'GEV': 'GE Vernova Inc.', 'OKLO': 'Oklo Inc.', 'SMR': 'NuScale Power Corp.',
+    'BWXT': 'BWX Technologies', 'VST': 'Vistra Corp.', 'TLN': 'Talen Energy Corp.',
+    'CEG': 'Constellation Energy', 'CVX': 'Chevron Corporation', 'XOM': 'Exxon Mobil',
+    
+    # 반도체 & 빅테크
+    'NVDA': 'NVIDIA Corp.', 'AAPL': 'Apple Inc.', 'MSFT': 'Microsoft Corp.',
+    'GOOGL': 'Alphabet Inc. (A)', 'AMZN': 'Amazon.com Inc.', 'META': 'Meta Platforms',
+    'TSLA': 'Tesla, Inc.', 'AVGO': 'Broadcom Inc.', 'ASML': 'ASML Holding',
+    'AMD': 'Advanced Micro Devices', 'MU': 'Micron Technology', 'AMAT': 'Applied Materials',
+    'LRCX': 'Lam Research', 'KLAC': 'KLA Corporation', 'QCOM': 'Qualcomm Inc.',
+    'TXN': 'Texas Instruments', 'INTU': 'Intuit Inc.', 'ADBE': 'Adobe Inc.',
+    'PANW': 'Palo Alto Networks', 'SNPS': 'Synopsys, Inc.', 'CDNS': 'Cadence Design Systems',
+    'ORCL': 'Oracle Corporation', 'CRM': 'Salesforce, Inc.', 'NFLX': 'Netflix, Inc.', 'IBM': 'IBM Corporation',
+    
+    # 제약 & 바이오
+    'LLY': 'Eli Lilly & Co.', 'JNJ': 'Johnson & Johnson', 'ABBV': 'AbbVie Inc.',
+    'MRK': 'Merck & Co.', 'PFE': 'Pfizer Inc.', 'MRNA': 'Moderna, Inc.',
+    'VRTX': 'Vertex Pharma', 'REGN': 'Regeneron Pharma', 'ISRG': 'Intuitive Surgical',
+    'GILD': 'Gilead Sciences', 'UNH': 'UnitedHealth Group',
+    
+    # 금융 & 소비재
+    'JPM': 'JPMorgan Chase', 'V': 'Visa Inc.', 'MA': 'Mastercard Inc.',
+    'WMT': 'Walmart Inc.', 'PG': 'Procter & Gamble', 'COST': 'Costco Wholesale',
+    'HD': 'Home Depot', 'KO': 'Coca-Cola Company', 'PEP': 'PepsiCo, Inc.',
+    'DIS': 'Walt Disney', 'GS': 'Goldman Sachs', 'AXP': 'American Express',
+    
+    # 산업재 & 원재료
+    'FCX': 'Freeport-McMoRan', 'ALB': 'Albemarle Corp.', 'NEM': 'Newmont Corp.',
+    'RIO': 'Rio Tinto', 'DOW': 'Dow Inc.', 'LIN': 'Linde plc',
+    'RTX': 'RTX Corporation', 'LMT': 'Lockheed Martin', 'DE': 'John Deere & Co.',
+    'GE': 'General Electric', 'BA': 'Boeing Company', 'CAT': 'Caterpillar Inc.', 'HON': 'Honeywell International'
 }
 
 SECTOR_TICKERS = {
-    'Tech': ['MSFT', 'GOOGL', 'META', 'NVDA', 'AAPL', 'AMD', 'AVGO', 'MU'],
-    'Healthcare': ['LLY', 'MRNA', 'PFE', 'JNJ'],
-    'Consumer': ['AMZN', 'WMT', 'TSLA', 'GM', 'F', 'MGM', 'MAR'],
-    'Financials': ['JPM', 'V', 'BAC'],
-    'Energy/Materials': ['XOM', 'CVX', 'SLB', 'ALB', 'RIO', 'NEM', 'DOW', 'NUE'],
-    'Industrials': ['CAT', 'DE', 'LMT', 'RTX'],
+    'Nuclear/Energy': ['GEV', 'OKLO', 'SMR', 'BWXT', 'VST', 'TLN', 'CEG', 'CVX', 'XOM'],
+    'Tech/Semi': ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'META', 'AVGO', 'ASML', 'AMD', 'MU', 'AMAT', 'LRCX', 'KLAC', 'QCOM', 'TXN', 'INTU', 'ADBE', 'PANW', 'SNPS', 'CDNS', 'ORCL', 'CRM', 'NFLX', 'IBM'],
+    'Healthcare': ['LLY', 'JNJ', 'ABBV', 'MRK', 'PFE', 'MRNA', 'VRTX', 'REGN', 'ISRG', 'GILD', 'UNH'],
+    'Consumer/Finance': ['AMZN', 'TSLA', 'WMT', 'PG', 'COST', 'HD', 'KO', 'PEP', 'DIS', 'JPM', 'V', 'MA', 'GS', 'AXP'],
+    'Industrials/Materials': ['FCX', 'ALB', 'NEM', 'RIO', 'DOW', 'LIN', 'RTX', 'LMT', 'DE', 'GE', 'BA', 'CAT', 'HON']
 }
+
 ALL_US_TICKERS = list(US_STOCKS_INFO.keys())
 
 USER_RS_SORT_ORDER = 'a'

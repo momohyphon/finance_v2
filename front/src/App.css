@@ -295,3 +295,9 @@ body {
 .glass-card li {
   color: #ffffff;
 }
+.tab-btn.high-rs {
+  background-color: #28a745 !important;
+  color: whjite !important;
+  font-weight: bold !important;
+  border: 1px solid #1e7e34 !important;
+}

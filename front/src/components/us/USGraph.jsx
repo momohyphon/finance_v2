@@ -13,7 +13,7 @@ const USGraphTrend = () => {
       if (docSnapshot.exists()) {
         const rankings = docSnapshot.data().rankings || [];
         const filtered = rankings
-          .filter(item => item.rs_avg >= 75)
+          .filter(item => item.rs_avg >= 85)
           .sort((a, b) => b.rs_avg - a.rs_avg)
           .slice(0, 12);
 
