@@ -83,6 +83,8 @@ tickers = {
     "S&P500 지수": ("^GSPC", "https://finance.yahoo.com/quote/^GSPC/"),
     "나스닥 선물": ("NQ=F", "https://finance.yahoo.com/quote/NQ=F/"),
     "S&P500 선물": ("ES=F", "https://finance.yahoo.com/quote/ES=F/"),
+    "코스피 지수": ("^KS11", "https://finance.yahoo.com/quote/%5EKS11/"),
+    "코스닥 지수": ("^KQ11", "https://finance.yahoo.com/quote/%5EKQ11/"),
     "WTI 유가": ("CL=F", "https://finance.yahoo.com/quote/CL=F/"),
     "금 가격": ("GC=F", "https://finance.yahoo.com/quote/GC=F/"),
     "비트코인": ("BTC-USD", "https://finance.yahoo.com/quote/BTC-USD/"),

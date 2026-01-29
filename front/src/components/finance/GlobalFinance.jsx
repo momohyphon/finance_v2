@@ -80,7 +80,7 @@ const GlobalFinance = ({ data }) => {
                 {/* 3열: MARKET II */}
                 <div style={orangeColStyle}>
                     <div style={{ fontSize: '14px', color: '#ff6b00', fontWeight: '900', marginBottom: '15px' }}>MARKET II</div>
-                    {items.slice(7, 14).map((item, idx) => (
+                    {items.slice(7).map((item, idx) => (
                         <div key={idx} 
                              onClick={() => item.Link && window.open(item.Link, "_blank")}
                              style={{ display: 'flex', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #111', cursor: 'pointer' }}>

@@ -118,7 +118,7 @@ const KRTable = () => {
                             <span style={{ width: '55px' }}>{s.rs_60}</span>
                             <span style={{ width: '55px' }}>{s.rs_30}</span>
                             <span style={{ width: '55px' }}>{s.rs_10}</span>
-                            <span style={{ width: '55px', fontWeight: '900', color: '#ff6b00' }}>{s.rs_avg}</span>
+                            <span style={{ width: '55px', fontWeight: '900', color: s.rs_avg >= 75 ?  '#2ecc71' : '#ff6b00' }}>{s.rs_avg}</span>
                             <span style={{ width: '75px', textAlign: 'right' }}>{s.disparity}%</span>
                         </div>
                     ))}
