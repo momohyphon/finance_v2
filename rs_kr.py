@@ -7,7 +7,7 @@ import os
 import firebase_admin
 from firebase_admin import credentials, firestore
 import json
-import pytz  # 👈 시간대 설정을 위해 추가
+import pytz
 
 # =========================================================================
 # 0. 한국 시간(KST) 설정
@@ -127,20 +127,37 @@ close_prices_final = close_prices_raw.ffill()
 index_prices_final = index_prices_raw.reindex(close_prices_final.index).ffill()
 
 # =========================================================================
-# 3. RS 계산
+# 3. RS 계산 (✅ 수정됨)
 # =========================================================================
 def calculate_period_rs(period, close_prices, index_prices):
+    """
+    상대강도(RS) 계산 함수
+    - 시장 대비 초과수익률 사용
+    - 초과수익 → 양수, 부진 → 음수
+    """
     if len(close_prices) < period + 1:
         return pd.Series(np.nan, index=close_prices.columns), 0
-    P_past, P_current = close_prices.iloc[-(period + 1)], close_prices.iloc[-1]
-    I_past, I_current = index_prices.iloc[-(period + 1)], index_prices.iloc[-1]
-    ret_stock, ret_index = (P_current / P_past) - 1, (I_current / I_past) - 1
-    excess = ret_stock - ret_index
-    idx_ret_val = abs(ret_index) if abs(ret_index) != 0 else 0.0001
-    rs_val = np.where(excess > 0, np.abs(ret_stock) / idx_ret_val, -np.abs(ret_stock) / idx_ret_val)
+    
+    # 과거 가격과 현재 가격
+    P_past = close_prices.iloc[-(period + 1)]
+    P_current = close_prices.iloc[-1]
+    I_past = index_prices.iloc[-(period + 1)]
+    I_current = index_prices.iloc[-1]
+    
+    # 수익률 계산
+    ret_stock = (P_current / P_past) - 1  # 개별 주식 수익률
+    ret_index = (I_current / I_past) - 1  # 지수 수익률
+    
+    # ✅ 초과수익률 (단순 뺄셈)
+    rs_val = ret_stock - ret_index
+    
+    # RS 값을 시리즈로 변환
     rs_series = pd.Series(rs_val, index=close_prices.columns)
+    
+    # 순위를 백분위로 변환 후 1-99점으로 스케일링
     ranks = rs_series.rank(pct=True, method='average')
     scores = (ranks * 98 + 1).round(0).astype('Int64')
+    
     return scores, round(ret_index * 100, 1)
 
 rs_results = {}
@@ -149,10 +166,23 @@ for p in RS_PERIODS:
     rs_results[f'RS_{p}D'] = scores
 
 rs_df = pd.DataFrame(rs_results)
+
+# 가중평균 계산
 weights = {'RS_180D': 0.2, 'RS_90D': 0.2, 'RS_60D': 0.2, 'RS_30D': 0.2, 'RS_10D': 0.2}
-rs_df['W_RS_Avg'] = rs_df.apply(lambda r: sum(r[c] * w for c, w in weights.items() if pd.notna(r[c])), axis=1).round(0).astype('Int64')
-rs_df['Disparity(%)'] = (((close_prices_final.iloc[-1] / close_prices_final.rolling(50).mean().iloc[-1]) - 1) * 100).round(1)
+rs_df['W_RS_Avg'] = rs_df.apply(
+    lambda r: sum(r[c] * w for c, w in weights.items() if pd.notna(r[c])), 
+    axis=1
+).round(0).astype('Int64')
+
+# 이격도 계산
+rs_df['Disparity(%)'] = (
+    ((close_prices_final.iloc[-1] / close_prices_final.rolling(50).mean().iloc[-1]) - 1) * 100
+).round(1)
+
+# 티커 이름 매핑
 rs_df['Ticker'] = rs_df.index.map(USER_ENGLISH_NAMES)
+
+# 정렬 및 인덱스 재설정
 final_df = rs_df.sort_values(by='W_RS_Avg', ascending=False).reset_index().rename(columns={'index': 'Code'})
 final_df.index = final_df.index + 1
 
@@ -184,7 +214,7 @@ try:
         })
 
     final_payload = {
-        "update_time": NOW_STR,  # 👈 한국 시간 적용
+        "update_time": NOW_STR,
         "rankings": kr_rank_list
     }
 

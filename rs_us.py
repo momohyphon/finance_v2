@@ -7,7 +7,7 @@ import os
 import firebase_admin
 from firebase_admin import credentials, firestore
 import json
-import pytz # 👈 한국 시간 설정을 위해 추가
+import pytz
 
 # =========================================================================
 # 0. 한국 시간(KST) 설정
@@ -94,29 +94,47 @@ except Exception as e:
     sys.exit(f"❌ 데이터 로드 실패: {e}")
 
 # =========================================================================
-# 3. RS 산식 적용
+# 3. RS 산식 적용 (✅ 수정됨)
 # =========================================================================
-def calculate_rs_v2(period, stocks, index):
-    s_ret = (stocks.iloc[-1] / stocks.iloc[-(period + 1)]) - 1
-    i_ret = (index.iloc[-1] / index.iloc[-(period + 1)]) - 1
-    i_ret_abs = np.where(np.abs(i_ret) == 0, 0.0001, np.abs(i_ret))
-    ratio = np.abs(s_ret) / i_ret_abs
-    excess = s_ret - i_ret
-    rs_val = np.where(excess > 0, ratio, -ratio)
+def calculate_rs_fixed(period, stocks, index):
+    """
+    상대강도(RS) 계산 함수 - 수정 버전
+    - 시장 대비 초과수익률 사용
+    - 초과수익 → 양수, 부진 → 음수
+    """
+    if len(stocks) < period + 1 or len(index) < period + 1:
+        return pd.Series(np.nan, index=stocks.columns), 0
+    
+    # 수익률 계산
+    s_ret = (stocks.iloc[-1] / stocks.iloc[-(period + 1)]) - 1  # 주식 수익률
+    i_ret = (index.iloc[-1] / index.iloc[-(period + 1)]) - 1    # 지수 수익률
+    
+    # ✅ 초과수익률 (단순 뺄셈)
+    rs_val = s_ret - i_ret
+    
+    # 순위를 백분위로 변환 후 1-99점으로 스케일링
     ranks = pd.Series(rs_val, index=stocks.columns).rank(pct=True)
     scores = (ranks * 98 + 1).round(0).astype('Int64')
+    
     return scores, round(i_ret * 100, 1)
 
 rs_results = {}
 for p in RS_PERIODS:
-    scores, _ = calculate_rs_v2(p, close_prices, index_prices)
+    scores, _ = calculate_rs_fixed(p, close_prices, index_prices)
     rs_results[f'RS_{p}D'] = scores
 
 rs_df = pd.DataFrame(rs_results)
-rs_df['W_RS_Avg'] = rs_df.apply(lambda r: sum(r[c] * 0.2 for c in rs_df.columns if pd.notna(r[c])), axis=1).round(0).astype('Int64')
+
+# 가중평균 계산
+rs_df['W_RS_Avg'] = rs_df.apply(
+    lambda r: sum(r[c] * 0.2 for c in rs_df.columns if pd.notna(r[c])), 
+    axis=1
+).round(0).astype('Int64')
+
 rs_df['Ticker'] = rs_df.index
 rs_df['Company Name'] = rs_df['Ticker'].map(US_STOCKS_INFO)
 
+# 이격도 계산
 ma50_latest = close_prices.rolling(window=50).mean().iloc[-1]
 rs_df['Disparity(%)'] = ((close_prices.iloc[-1] / ma50_latest) - 1) * 100
 rs_df['Disparity(%)'] = rs_df['Disparity(%)'].astype(float).round(1)
@@ -151,7 +169,7 @@ try:
         })
     
     final_payload = {
-        "update_time": NOW_STR,  # 👈 한국 시간 적용 완료
+        "update_time": NOW_STR,
         "sort_standard": USER_RS_SORT_ORDER,
         "rankings": us_rank_list
     }
