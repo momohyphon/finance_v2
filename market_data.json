@@ -1,21 +1,11 @@
 {
-  "update_time": "2026-02-13 09:54",
-  "bonds": {
-    "2Y_val": 3.52,
-    "2Y_chg": 2.03,
-    "2Y_link": "https://finance.yahoo.com/quote/ZT=F/",
-    "10Y_val": 4.1,
-    "10Y_chg": -1.63,
-    "10Y_link": "https://finance.yahoo.com/quote/%5ETNX/",
-    "30Y_val": 4.73,
-    "30Y_chg": -1.72,
-    "30Y_link": "https://finance.yahoo.com/quote/%5ETYX/"
-  },
+  "update_time": "2026-02-13 14:00",
+  "bonds": {},
   "items": [
     {
       "name": "달러 인덱스",
-      "price": 96.72,
-      "change": 0.05,
+      "price": 96.84,
+      "change": 0.12,
       "Link": "https://finance.yahoo.com/quote/DX-Y.NYB/"
     },
     {
@@ -32,44 +22,44 @@
     },
     {
       "name": "나스닥 선물",
-      "price": 24749.25,
-      "change": -2.13,
+      "price": 24765.0,
+      "change": -0.01,
       "Link": "https://finance.yahoo.com/quote/NQ=F/"
     },
     {
       "name": "S&P500 선물",
-      "price": 6847.25,
-      "change": -1.63,
+      "price": 6850.25,
+      "change": -0.01,
       "Link": "https://finance.yahoo.com/quote/ES=F/"
     },
     {
       "name": "코스피 지수",
-      "price": 5498.17,
-      "change": 2.68,
+      "price": 5570.26,
+      "change": 0.87,
       "Link": "https://finance.yahoo.com/quote/%5EKS11/"
     },
     {
       "name": "코스닥 지수",
-      "price": 1102.14,
-      "change": -1.14,
+      "price": 1109.83,
+      "change": -1.44,
       "Link": "https://finance.yahoo.com/quote/%5EKQ11/"
     },
     {
       "name": "WTI 유가",
-      "price": 62.85,
-      "change": -2.75,
+      "price": 62.74,
+      "change": -0.16,
       "Link": "https://finance.yahoo.com/quote/CL=F/"
     },
     {
       "name": "금 가격",
-      "price": 4957.3,
-      "change": -2.25,
+      "price": 4993.6,
+      "change": 1.42,
       "Link": "https://finance.yahoo.com/quote/GC=F/"
     },
     {
       "name": "비트코인",
-      "price": 65843.54,
-      "change": -1.71,
+      "price": 66374.13,
+      "change": -0.92,
       "Link": "https://finance.yahoo.com/quote/BTC-USD/"
     },
     {
@@ -86,19 +76,19 @@
     },
     {
       "name": "구리 가격",
-      "price": 5.78,
-      "change": -2.91,
+      "price": 5.84,
+      "change": 1.12,
       "Link": "https://finance.yahoo.com/quote/HG=F/"
     },
     {
       "name": "환율(엔화)",
-      "price": 152.869,
-      "change": -0.26,
+      "price": 153.244,
+      "change": -0.02,
       "Link": "https://finance.yahoo.com/quote/JPY%3DX/"
     },
     {
       "name": "환율(원화)",
-      "price": 1443.48,
+      "price": 1443.51,
       "change": -0.05,
       "Link": "https://finance.yahoo.com/quote/KRW=X/"
     }
