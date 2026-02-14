@@ -80,7 +80,7 @@ try:
 
             # 🔥 오빠 원본 정렬 로직 및 20개 유지
             articles.sort(key=lambda x: x['dt_index'], reverse=True)
-            final_articles = articles[:10]
+            final_articles = articles[:20]
 
             for a in final_articles: del a['dt_index']
 
