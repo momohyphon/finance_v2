@@ -1,95 +1,105 @@
 {
-  "update_time": "2026-02-13 14:00",
-  "bonds": {},
+  "update_time": "2026-02-15 14:04",
+  "bonds": {
+    "5Y_val": 3.67,
+    "5Y_chg": -2.13,
+    "5Y_link": "https://finance.yahoo.com/quote/%5EFVX/",
+    "10Y_val": 4.06,
+    "10Y_chg": -1.17,
+    "10Y_link": "https://finance.yahoo.com/quote/%5ETNX/",
+    "30Y_val": 4.7,
+    "30Y_chg": -0.7,
+    "30Y_link": "https://finance.yahoo.com/quote/%5ETYX/"
+  },
   "items": [
     {
       "name": "달러 인덱스",
-      "price": 96.84,
-      "change": 0.12,
+      "price": 96.82,
+      "change": -0.02,
       "Link": "https://finance.yahoo.com/quote/DX-Y.NYB/"
     },
     {
       "name": "나스닥 지수",
-      "price": 22597.15,
-      "change": -2.03,
+      "price": 22546.67,
+      "change": -0.22,
       "Link": "https://finance.yahoo.com/quote/^IXIC/"
     },
     {
       "name": "S&P500 지수",
-      "price": 6832.76,
-      "change": -1.57,
+      "price": 6836.17,
+      "change": 0.05,
       "Link": "https://finance.yahoo.com/quote/^GSPC/"
     },
     {
       "name": "나스닥 선물",
-      "price": 24765.0,
-      "change": -0.01,
+      "price": 24803.25,
+      "change": 0.14,
       "Link": "https://finance.yahoo.com/quote/NQ=F/"
     },
     {
       "name": "S&P500 선물",
-      "price": 6850.25,
+      "price": 6850.5,
       "change": -0.01,
       "Link": "https://finance.yahoo.com/quote/ES=F/"
     },
     {
       "name": "코스피 지수",
-      "price": 5570.26,
-      "change": 0.87,
+      "price": 5507.01,
+      "change": -0.28,
       "Link": "https://finance.yahoo.com/quote/%5EKS11/"
     },
     {
       "name": "코스닥 지수",
-      "price": 1109.83,
-      "change": -1.44,
+      "price": 1106.08,
+      "change": -1.77,
       "Link": "https://finance.yahoo.com/quote/%5EKQ11/"
     },
     {
       "name": "WTI 유가",
-      "price": 62.74,
-      "change": -0.16,
+      "price": 62.89,
+      "change": 0.08,
       "Link": "https://finance.yahoo.com/quote/CL=F/"
     },
     {
       "name": "금 가격",
-      "price": 4993.6,
-      "change": 1.42,
+      "price": 5046.3,
+      "change": 2.49,
       "Link": "https://finance.yahoo.com/quote/GC=F/"
     },
     {
       "name": "비트코인",
-      "price": 66374.13,
-      "change": -0.92,
+      "price": 70150.44,
+      "change": 1.88,
       "Link": "https://finance.yahoo.com/quote/BTC-USD/"
     },
     {
       "name": "반도체(SOXX)",
-      "price": 351.5,
-      "change": -2.42,
+      "price": 354.66,
+      "change": 0.9,
       "Link": "https://finance.yahoo.com/quote/SOXX/"
     },
     {
       "name": "철강(SLX)",
-      "price": 99.76,
-      "change": -2.64,
+      "price": 98.7,
+      "change": -1.06,
       "Link": "https://finance.yahoo.com/quote/SLX/"
     },
     {
       "name": "구리 가격",
-      "price": 5.84,
-      "change": 1.12,
+      "price": 5.8,
+      "change": 0.55,
       "Link": "https://finance.yahoo.com/quote/HG=F/"
     },
     {
       "name": "환율(엔화)",
-      "price": 153.244,
-      "change": -0.02,
+      "price": 152.821,
+      "change": -0.29,
       "Link": "https://finance.yahoo.com/quote/JPY%3DX/"
     },
     {
       "name": "환율(원화)",
-      "price": 1443.51,
-      "change": -0.05,
+      "price": 1443.3,
+      "change": 0.17,
       "Link": "https://finance.yahoo.com/quote/KRW=X/"
     }
   ]

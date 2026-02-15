@@ -79,7 +79,7 @@ const GlobalFinance = ({ data }) => {
                 {/* 1열: TREASURY */}
                 <div style={orangeColStyle}>
                     <div style={{ fontSize: '14px', color: '#ff6b00', fontWeight: '900', marginBottom: '15px' }}>TREASURY</div>
-                    {["2Y", "10Y", "30Y"].map((key) => (
+                    {["5Y", "10Y", "30Y"].map((key) => (
                         <div key={key} 
                              onClick={() => bonds?.[`${key}_link`] && window.open(bonds[`${key}_link`], "_blank")}
                              style={{ display: 'flex', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #111', cursor: 'pointer' }}>

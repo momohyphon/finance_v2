@@ -50,10 +50,10 @@ print(f"━━━━━━━━━━━━━━━━━━━━━━━━
 
 try:
     # 2년물
-    dgs2 = pdr.DataReader('DGS2', 'fred', start, end).dropna()
-    l2, p2 = dgs2['DGS2'].iloc[-1], dgs2['DGS2'].iloc[-2]
-    c2 = (l2 - p2) / p2 * 100
-    print(f" > 미국채 2년 금리:  {l2:.2f}% ({c2:+.2f}%)")
+    dgs5 = pdr.DataReader('DGS5', 'fred', start, end).dropna()
+    l5, p5 = dgs5['DGS5'].iloc[-1], dgs5['DGS5'].iloc[-2]
+    c5 = (l5 - p5) / p5 * 100
+    print(f" > 미국채 5년 금리:  {l5:.2f}% ({c5:+.2f}%)")
 
     # 10년물
     tnx = fdr.DataReader('^TNX')['Close'].dropna()
@@ -69,7 +69,7 @@ try:
     print(f"--------------------------------------------------")
 
     finance_payload["bonds"] = {
-        "2Y_val": round(l2, 2), "2Y_chg": round(c2, 2), "2Y_link": "https://finance.yahoo.com/quote/ZT=F/",
+        "5Y_val": round(l5, 2), "5Y_chg": round(c5, 2), "5Y_link": "https://finance.yahoo.com/quote/%5EFVX/",
         "10Y_val": round(l10, 2), "10Y_chg": round(c10, 2), "10Y_link": "https://finance.yahoo.com/quote/%5ETNX/",
         "30Y_val": round(l30, 2), "30Y_chg": round(c30, 2), "30Y_link": "https://finance.yahoo.com/quote/%5ETYX/"
     }
